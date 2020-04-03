@@ -21,7 +21,7 @@ module.exports = {
 				<option value="2">URL</option>
 			</select>
 		</div>
-		<div style="float: right; width 60%;">
+		<div style="padding-left: 3%; float: left; width: 60%;">
 			Play Type:<br>
 			<select id="Ptype" class="round">
 				<option value="0" selected>Add to Queue</option>
@@ -30,20 +30,22 @@ module.exports = {
 		</div>
 	</div><br><br><br>
 	<div>
-		<div style="float: left; width 90%;">
-			<div id="typeplaceholder">Local URL:</dv><br>
-			<input id="play" class="round" type="text>
+		<div style="float: left; width: 100%;">
+			Play URL:<br>
+			<input id="play" class="round" type="text">
 		</div>
-	</div>
-	<div style="float: left; width: 50%;">
-		Seek Position:<br>
-		<input id="seek" class="round" type="text" value="0"><br>
-	</div>
-	<div style="float: right; width: 50%;">
-		Volume (0 = min; 100 = max):<br>
-		<input id="volume" class="round" type="text" placeholder="Leave blank for automatic..."><br>
-		Bitrate (kbps):<br>
-		<input id="bitrate" class="round" type="text" placeholder="Leave blank for automatic...">
+	</div><br><br><br>
+	<div>
+		<div style="float: left; width: 35%;">
+			Seek Position:<br>
+			<input id="seek" class="round" type="text" value="0"><br>
+		</div>
+		<div style="padding-left: 3%; float: left; width: 60%;">
+			Volume (0 = min; 100 = max):<br>
+			<input id="volume" class="round" type="text" placeholder="Leave blank for automatic..."><br>
+			Bitrate (kbps):<br>
+			<input id="bitrate" class="round" type="text" placeholder="Leave blank for automatic...">
+		</div>
 	</div>`
 	},
 
@@ -60,10 +62,8 @@ module.exports = {
 		}
 		if(data.volume) {
 			item.options.volume = parseInt(this.evalMessage(data.volume, cache)) / 100;
-		} else if(cache.server) {
-			item.options.volume = Audio.volumes[cache.server.id] || 0.5;
 		} else {
-			item.options.volume = 0.5;
+			item.options.volume = 0.99;
 		}
 		if(data.bitrate) {
 			item.options.bitrate = parseInt(this.evalMessage(data.bitrate, cache));
@@ -71,9 +71,10 @@ module.exports = {
 			item.options.bitrate = 'auto';
 		}
 		item.options.fec = true;
-		item.options.plp = 0.1;
-		item.options.cache = false;
-		item.options.expire = Math.floor(new Date().getTime() / 1000) + 1800;
+		item.options.plp = 0;
+		item.options.highWaterMark = 20;
+		item.cache = false;
+		item.expire = Math.floor(new Date().getTime() / 1000) + 1800;
 		item.url = this.evalMessage(data.play, cache);
 		switch (parseInt(data.type)) {
 			case 0:
@@ -89,7 +90,7 @@ module.exports = {
 		if(parseInt(data.Ptype) == 0) {
 			Audio.addToQueue(item, cache.server.id);
 		} else {
-			Audio.playItem(item, cache.server.id);
+			Audio.playItem(item, cache.server.id, true);
 		}
 		this.callNextAction(cache);
 	},

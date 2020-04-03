@@ -14,13 +14,12 @@ module.exports = {
 	html: function(isEvent, data) {
 		return `
 	<div>
-		<div style="float: right; width: 50%; padding-top: 8px;">
+		<div style="float: left; width: 80%;">
 			Loop Operation:<br>
 			<select id="loop" class="round">
 				<option value="0" selected>Start Loop Current Item</option>
-				<option value="1">Stop Loop Current Item</option>
-				<option value="2">Start Loop Whole Queue</option>
-				<option value="3">Stop Loop Whole Queue</option>
+				<option value="1">Start Loop Whole Queue</option>
+				<option value="2">Stop Loop</option>
 			</select><br>
 		</div>
 	</div>`;
@@ -40,11 +39,10 @@ module.exports = {
 				Audio.loop[server.id] = "item";
 				break;
 			case 1:
-			case 3:
-				Audio.loop[server.id] = false;
+				Audio.loop[server.id] = "queue";
 				break;
 			case 2:
-				Audio.loop[server.id] = "queue";
+				Audio.loop[server.id] = false;
 				break;
 		};
 

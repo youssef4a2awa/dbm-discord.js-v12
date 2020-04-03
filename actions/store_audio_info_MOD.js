@@ -220,7 +220,7 @@ div.embed { /* <div class="embed"></div> */
         const server = parseInt(data.server);
         const varName2 = this.evalMessage(data.varName2, cache);
         const TimeFormat = this.getWrexMods().require('hh-mm-ss');
-        const info = parseInt(data.info);
+        //const info = parseInt(data.info);
 
         const audio = this.getDBM().Audio;
 
@@ -236,6 +236,10 @@ div.embed { /* <div class="embed"></div> */
         }
 
         let result;
+        console.log("SAI")
+        console.log(audio.dispatchers[targetServer.id].player.streamingData)
+        console.log(Math.floor(new Date().getTime() / 1000))
+        for (let info = 0; info < 15; info++) {
         switch(info) {
             case 0:
                 result = audio.volumes[targetServer.id] && parseInt(audio.volumes[targetServer.id]) * 100 || 50; // volume
@@ -244,6 +248,7 @@ div.embed { /* <div class="embed"></div> */
                 result = audio.dispatchers[targetServer.id] && audio.dispatchers[targetServer.id] ? true : false; // is playing
                 break;
             case 2:
+                console.log(audio.dispatchers[targetServer.id].player.streamingData.startTime)
                 result = audio.dispatchers[targetServer.id] && audio.dispatchers[targetServer.id].player.streamingData.startTime || 0; // when the music first started playing
                 break;
             case 3:
@@ -287,6 +292,9 @@ div.embed { /* <div class="embed"></div> */
                 break;
             default:
                 break;
+        }
+        console.log(info)
+        console.log(result)
         }
         if(result !== undefined) {
             const storage = parseInt(data.storage);

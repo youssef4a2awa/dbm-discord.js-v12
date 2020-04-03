@@ -5,11 +5,11 @@ module.exports = {
 	section: "Audio Control",
 
 	subtitle: function(data) {
-		const actions = ["Stop Playing", "Pause Audio", "Resume Audio", "Forward Audio", "Rewind Audio", "Replay Audio"];
+		const actions = ["Stop Playing", "Pause Audio", "Resume Audio", "Forward Audio", "Rewind Audio", "Replay Audio", "Play At Seek"];
 		return `${actions[parseInt(data.action)]}`;
 	},
 
-	fields: ["action"],
+	fields: ["action", "amount"],
 
 	html: function(isEvent, data) {
 		return `
@@ -22,9 +22,10 @@ module.exports = {
 			<option value="3">Forward Audio</option>
 			<option value="4">Rewind Audio</option>
 			<option value="5">Replay Audio</option>
+			<option value="6">Play at Seek</option>
 		</select>
 	</div>
-	<div id="placeholder" style="float: right; width: 60%; display: none;">
+	<div id="placeholder" style="float: right; width: 55%; display: none;">
 		Amount:<br>
 		<input id="amount" type="text" class="round">
 	</div>`;
@@ -40,11 +41,12 @@ module.exports = {
 				case 0:
 				case 1:
 				case 2:
+				case 5:
 					placeholder.style.display = "none";
 					break;
 				case 3:
 				case 4:
-				case 5:
+				case 6:
 					placeholder.style.display = null;
 					break;
 			}
@@ -66,25 +68,33 @@ module.exports = {
 			let amount;
 			switch(action) {
 				case 0:
-					Audio.dispatchers[server.id]._destroy();
-					Audio.dispatchers[server.id] = null;
+					DBM.LeonZ.onStop(server.id);
+					dispatcher.destroy();
 					break;
 				case 1:
-					dispatcher.pause();
+					dispatcher.pause(true);
 					break;
 				case 2:
-					dispatcher.resume();
+					if (typeof dispatcher == "undefined") {
+						Audio.playNext(server.id);
+					} else {
+						dispatcher.resume();
+					}
 					break;
 				case 3:
 					amount = parseInt(this.evalMessage(data.amount, cache));
-					Audio.controlAudio(server.id, 5, amount)
+					Audio.controlAudio(server.id, 3, amount);
 					break;
 				case 4:
 					amount = parseInt(this.evalMessage(data.amount, cache));
-					Audio.controlAudio(server.id, 5, amount)
+					Audio.controlAudio(server.id, 4, amount);
 					break;
 				case 5:
 					Audio.controlAudio(server.id, 5)
+					break;
+				case 6:
+					amount = parseInt(this.evalMessage(data.amount, cache));
+					Audio.controlAudio(server.id, 6, amount);
 					break;
 			}
 		}

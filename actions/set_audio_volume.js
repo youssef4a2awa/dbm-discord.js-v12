@@ -16,9 +16,8 @@ module.exports = {
 		<div style="float: left; width: 35%;">
 			Volume Type:<br>
 			<select id="type" class="round">
-				<option value="0" selected>Decibels (db)</option>
-				<option value="1">Perceived</option>
-				<option value="2">Default</option>
+				<option value="0">Basic</option>
+				<option value="1">Perceived (Use Carefully)</option>
 			</select>
 		</div>
 		<div style="float: left; width: 80%;">
@@ -42,14 +41,10 @@ module.exports = {
 		const options = {}
 		switch (parseInt(data.type)) {
 			case 0:
-				options.type = "db";
-				options.volume = parseInt(this.evalMessage(data.volume, cache));
+				options.volume = parseInt(this.evalMessage(data.volume, cache)) / 100;
 				break;
 			case 1:
 				options.type = "perceived";
-				options.volume = parseInt(this.evalMessage(data.volume, cache)) / 100;
-				break;
-			case 2:
 				options.volume = parseInt(this.evalMessage(data.volume, cache)) / 100;
 				break;
 		}

@@ -60,7 +60,7 @@ module.exports = {
 		const data = cache.actions[cache.index];
 		const info = parseInt(data.info);
 		const find = this.evalMessage(data.find, cache);
-		const channels = server.channels.filter(channel => {
+		const channels = server.channels.cache.filter(channel => {
 			return channel.type === 'text';
 		});
 		let result;

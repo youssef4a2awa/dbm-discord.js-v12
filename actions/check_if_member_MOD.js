@@ -97,7 +97,7 @@ module.exports = {
 				result = Boolean(member.kickable);
 				break;
 			case 4:
-				if(member.voice.id !== undefined && member.voice.id !== null) {
+				if(member.voice.channelID !== undefined && member.voice.channelID !== null) {
 					result = true;
 				} else {
 					result = false;
@@ -126,7 +126,7 @@ module.exports = {
 				result = Boolean(member.user.id === msg.guild.owner.id);
 				break;
 			case 11:
-				result = Boolean(member.presence.activities.type === "STREAMING")
+				result = Boolean(member.voice.streaming);
 			default:
 				console.log('Please check your "Check if Member" action! There is something wrong...');
 				break;

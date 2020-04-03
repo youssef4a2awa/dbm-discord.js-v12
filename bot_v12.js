@@ -938,7 +938,7 @@ Actions.executeResults = function(result, data, cache) {
 				}
 				break;
 			case 4:
-				const id = this.evalMessage(data.iffalseVal, cache);
+				const id = this.evalMessage(data.iftrueVal, cache);
 				this.anchorJump(id, cache);
 				break;
 			default:
@@ -1833,40 +1833,64 @@ Audio.dispatchers = {};
 Audio.caches = {};
 
 Audio.connectToVoice = function(voiceChannel) {
-	voiceChannel.join().then(connection => {
-		this.loop[voiceChannel.guild.id] == false;
+	const promise = voiceChannel.join();
+	promise.then(function(connection) {
+		this.loop[voiceChannel.guild.id] = false;
 		this.connections[voiceChannel.guild.id] = connection;
+		this.volumes[voiceChannel.guild.id] = 1;
 		connection.on('disconnect', function() {
 			this.connections[voiceChannel.guild.id] = null;
 			this.loop[voiceChannel.guild.id] = null;
 			this.dispatchers[guild.id] = null;
-		})
-	}).catch(console.error())
+		}.bind(this));
+	}.bind(this)).catch(console.error);
+	return promise;
 }
 
 Audio.loadInfo = function(item, position, id) {
 	const readStream = this.ytdl(item.url, { filter: "audioonly"});
 
 	readStream.on('end',() => {
+		const cache = {}
+		cache.cache = true;
+		cache.expiresAt = Math.floor(new Date().getTime() / 1000);
+		if (!this.caches[id]) {
+			this.caches[id] = {};
+		}
 		item.cache = true;
+		this.caches[id][item.id] = cache;
 		this.queue[id][position] = item;
 	})
 
 	readStream.on('info', (info,format) => {
 		item.title = info.title;
 		item.id = info.video_id;
-		item.duration = info.length_seconds;
+		item.thumbnail = "https://i.ytimg.com/vi/"+item.id+"/maxresdefault.jpg"
+		item.duration = parseInt(info.length_seconds);
 		item.local = ".\\resources\\"+info.video_id+".mp3";
-		this.queue[id][position] = item;
-		readStream.pipe(fs.createWriteStream(output))
+		readStream.pipe(fs.createWriteStream(item.local))
 	})
 }
 
-Audio.playItem = function(item, id) {
-	if (!this.connections[id]) return;
-	if (!this.queue[id]) {
-		this.queue[id] = [];
-		this.queue[id].push(item);
+Audio.playItem = function(item, id, immediately) {
+	const voice = Bot.bot.guilds.cache.get(id).me.voice
+	if (!this.connections[id] && voice.channelID != undefined) {
+		voice.setChannel(null);
+		return;
+	} else if (!this.connections[id]) {
+		return;
+	}
+	if (this.dispatchers[id]) {
+		if (immediately == true) {
+			this.dispatcherss[id].destroy();
+			this.queue[id] = [];
+			this.queue[id].push(item);
+		}
+	} else {
+		if (!this.queue[id]) {
+			this.queue[id] = [];
+			this.queue[id].push(item);
+		}
 	}
 	switch (item.type) {
 		case 'file':
@@ -1883,58 +1907,73 @@ Audio.playItem = function(item, id) {
 			break;
 	}
 	this.dispatchers[id].on('speaking',function(talk) {
-		if (!talk) {
-			if (this.queue[id][0].type == "yt") {
-				this.caches[item.id] = Math.floor(new Date().getTime() / 1000) + 1800;
-				const bot = this.bot;
-				this.startTimeout(item.local,id,bot);
+		if (!talk && !Audio.dispatchers[id].paused) {
+			DBM.LeonZ.onStop(id);
+			if (Audio.queue[id][0].type == "yt" && item.cache) {
+				Audio.caches[id][item.id].expiresAt = Math.floor(new Date().getTime() / 1000) + 1800;
+				//Audio.startTimeout(item.local, id);
 			}
-			if(!this.loop[id]) {
-				this.queue[id].shift();
-			} else if (this.loop[id] == "queue") {
-				const item = this.queue[id].shift;
-				this.queue[id].push(item);
+			if(Audio.loop[id] == false) {
+				Audio.queue[id].shift();
+			} else if (Audio.loop[id] == "queue") {
+				const firstItem = Audio.queue[id].shift();
+				Audio.queue[id].push(firstItem);
 			}
-			if (this.queue[id].length > 0) {
-				this.playNext(id);
+			if (Audio.queue[id].length > 0) {
+				Audio.playNext(id);
+			} else {
+				Audio.dispatchers[id].destroy();
 			}
+		} else if (talk == 1) {
+			DBM.LeonZ.onPlay(item,id);
 		}
 	})
 }
 
 Audio.controlAudio = function(id,action,amount) {
-	const seek = this.dispatchers[id].streamOptions.passes * 20;
 	const item = this.queue[id][0];
-	switch(action) {
-		case 3:
-			item.options.seek = seek + amount;
+	if (item.cache) {
+		const played = this.dispatchers[id].count * 0.02;
+		const seek = item.options.seek;
+		let play;
+		switch(action) {
+			case 3:
+				play = played + seek + parseInt(amount);
+				break;
+			case 4:
+				play = played + seek - parseInt(amount);
+				break;
+			case 5:
+				play = 0;
+				break;
+			case 6:
+				play = parseInt(amount);
+				break;
+		}
+		if (play >= 0 && play < item.duration) {
+			item.options.seek = play;
 			this.playItem(item,id)
-			break;
-		case 4:
-			item.options.seek = seek - amount;
-			this.playItem(item,id)
-			break;
-		case 5:
-			this.playItem(item,id);
-			break;
+		} else {
+			console.error("Can't play the song with the amount")
+		}
+	} else {
+		console.log("Please wait to finish cache to song to system.")
 	}
 }
 
 Audio.playNext = function(id, forceSkip) {
-	if(!this.connections[id] || !this.queue[id] || this.queue[id].length < 1 ) return;
-	let item;
+	if(!this.connections[id] || !this.queue[id] || this.queue[id].length < 1) return;
 	if (forceSkip && this.queue[id].length > 1) {
 		this.queue[id].shift();
-		item = this.queue[id][0];
-	} else if (!this.connection[id].voice.speaking) {
-		item = this.queue[id][0];
 	}
+	const item = this.queue[id][0];
 	if (item) {
 		this.playItem(item, id);
 	}
 }
 
-Audio.startTimeout = function(path,id,bot) {
+Audio.startTimeout = function(path,id) {
+	const bot = this.bot;
 	bot.setTimeout(function(path,id) {
 		if (fs.existsSync(path)) {
 			if (Math.floor(new Date().getTime() / 1000) > this.caches[id]) {
@@ -2024,9 +2063,6 @@ Audio.recordAudio = function(member, options, id) {
 Audio.setVolume = function(options, id) {
 	if(this.dispatchers[id]) {
 		switch(options.type) {
-			case 'db':
-				this.dispatchers[id].setVolumeDecibels(options.volume);
-				break;
 			case 'perceived':
 				this.dispatchers[id].setVolumeLogarithmic(options.volume);
 				break;
@@ -2034,6 +2070,7 @@ Audio.setVolume = function(options, id) {
 				this.dispatchers[id].setVolume(options.volume);
 				break;
 		}
+		this.volumes[id] = this.dispatchers[id].player.dispatcher.streams.volume.volume;
 	}
 }
 
