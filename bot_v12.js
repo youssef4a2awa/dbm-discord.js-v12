@@ -7,6 +7,7 @@
 
 const DBM = {};
 DBM.version = "12.0.2";
+DBM.modifyVersion = "1.0.0";
 
 const DiscordJS = DBM.DiscordJS = require('discord.js');
 
