@@ -49,8 +49,6 @@ module.exports = {
 		}
 	},
 
-	requiresAudioLibraries: true,
-
 	mod: function(DBM) {
 	}
 

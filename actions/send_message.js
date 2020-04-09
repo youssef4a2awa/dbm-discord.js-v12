@@ -99,10 +99,10 @@ module.exports = {
 				this.storeValue(resultMsg, storage, varName2, cache);
 				this.callNextAction(cache);
 			}.bind(this)).catch(err => {
-				if(err.message == ('Cannot send messages to this user')) {
+				if(err.message == 'Cannot send messages to this user') {
 					this.executeResults(false, data, cache);
 				} else {
-				this.displayError.bind(this, data, cache)}
+				this.displayError.bind(err, data, cache)}
 			});
 		} else {
 			this.callNextAction(cache);

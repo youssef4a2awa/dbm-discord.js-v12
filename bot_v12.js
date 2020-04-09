@@ -1,12 +1,12 @@
 /******************************************************
  * Discord Bot Maker Bot
  * Version 1.5.11
- * Discord.js 12.0.2
+ * Discord.js 12.1.1
  * Robert Borghese
  ******************************************************/
 
 const DBM = {};
-DBM.version = "12.0.2";
+DBM.version = "12.1.1";
 DBM.modifyVersion = "1.0.0";
 
 const DiscordJS = DBM.DiscordJS = require('discord.js');
@@ -1757,7 +1757,7 @@ Files.restoreMember = function(value, bot) {
 	const split = value.split('_');
 	const memId = split[0].slice(4);
 	const serverId = split[1].slice(2);
-	const server = bot.guilds.get(serverId);
+	const server = bot.guilds.cache.get(serverId);
 	if(server && server.members) {
 		const member = server.members.get(memId);
 		return member;
@@ -1768,7 +1768,7 @@ Files.restoreMessage = function(value, bot) {
 	const split = value.split('_');
 	const msgId = split[0].slice(4);
 	const channelId = split[1].slice(2);
-	const channel = bot.channels.get(channelId);
+	const channel = bot.channels.cache.get(channelId);
 	if(channel && channel.fetchMessage) {
 		return channel.fetchMessage(msgId);
 	}
@@ -1776,13 +1776,13 @@ Files.restoreMessage = function(value, bot) {
 
 Files.restoreTextChannel = function(value, bot) {
 	const channelId = value.slice(3);
-	const channel = bot.channels.get(channelId);
+	const channel = bot.channels.cache.get(channelId);
 	return channel;
 };
 
 Files.restoreVoiceChannel = function(value, bot) {
 	const channelId = value.slice(3);
-	const channel = bot.channels.get(channelId);
+	const channel = bot.channels.cache.get(channelId);
 	return channel;
 };
 
@@ -1790,7 +1790,7 @@ Files.restoreRole = function(value, bot) {
 	const split = value.split('_');
 	const roleId = split[0].slice(2);
 	const serverId = split[1].slice(2);
-	const server = bot.guilds.get(serverId);
+	const server = bot.guilds.cache.get(serverId);
 	if(server && server.roles) {
 		const role = server.roles.get(roleId);
 		return role;
@@ -1799,7 +1799,7 @@ Files.restoreRole = function(value, bot) {
 
 Files.restoreServer = function(value, bot) {
 	const serverId = value.slice(2);
-	const server = bot.guilds.get(serverId);
+	const server = bot.guilds.cache.get(serverId);
 	return server;
 };
 
@@ -1825,10 +1825,13 @@ Files.initEncryption();
 const Audio = DBM.Audio = {};
 
 Audio.ytdl = require('ytdl-core');
+Audio.ytsr = require('ytsr');
+Audio.ytpl = require('ytpl');
+Audio.fs = require('fs');
 
 Audio.queue = {};
 Audio.loop = {};
-Audio.volumes = {}
+Audio.volumes = {};
 Audio.connections = {};
 Audio.dispatchers = {};
 Audio.caches = {};
@@ -1840,40 +1843,61 @@ Audio.connectToVoice = function(voiceChannel) {
 		this.connections[voiceChannel.guild.id] = connection;
 		this.volumes[voiceChannel.guild.id] = 1;
 		connection.on('disconnect', function() {
-			this.connections[voiceChannel.guild.id] = null;
-			this.loop[voiceChannel.guild.id] = null;
-			this.dispatchers[guild.id] = null;
+			delete this.connections[voiceChannel.guild.id];
+			delete this.loop[voiceChannel.guild.id];
+			delete this.dispatchers[guild.id];
 		}.bind(this));
-	}.bind(this)).catch(console.error);
+	}.bind(this)).catch(function(err) {
+		if (err.message == 'Connection not established within 15 seconds.') {
+			Bot.bot.guilds.cache.get(voiceChannel.guild.id).me.voice.setChannel(null);
+		}
+	});
 	return promise;
 }
 
-Audio.loadInfo = function(item, position, id) {
-	const readStream = this.ytdl(item.url, { filter: "audioonly"});
+Audio.loadInfo = function(item, id, index) {
+		const readStream = this.ytdl(item.url, { filter: "audioonly"});
+		const cache = {};
+		cache.chunks = [];
 
-	readStream.on('end',() => {
-		const cache = {}
-		cache.cache = true;
-		cache.expiresAt = Math.floor(new Date().getTime() / 1000);
-		if (!this.caches[id]) {
-			this.caches[id] = {};
-		}
-		item.cache = true;
-		this.caches[id][item.id] = cache;
-		this.queue[id][position] = item;
-	})
+		readStream.on('info', (info,format) => {
+			cache.id = info.video_id;
+			Audio.queue[id][index].id = info.video_id;
+			if (Audio.caches[cache.id]) {
+				if (Audio.caches[cache.id].cache) {
+					Audio.queue[id][index].cache = true;
+				}
+				readStream.destroy();
+			} else {
+				cache.thumbnail = "https://i.ytimg.com/vi/" + info.video_id + "/maxresdefault.jpg";
+				cache.title = info.title;
+				cache.cache = false;
+				cache.duration = parseInt(info.length_seconds);
+				Audio.caches[cache.id] = cache;
+			}
+		});
 
-	readStream.on('info', (info,format) => {
-		item.title = info.title;
-		item.id = info.video_id;
-		item.thumbnail = "https://i.ytimg.com/vi/"+item.id+"/maxresdefault.jpg"
-		item.duration = parseInt(info.length_seconds);
-		item.local = ".\\resources\\"+info.video_id+".mp3";
-		readStream.pipe(fs.createWriteStream(item.local))
-	})
+		readStream.on('data', (chunk) => {
+			cache.chunks.push(chunk)
+
+		});
+
+		readStream.on('end', () => {
+			cache.expiresAt = Math.floor(new Date().getTime() / 1000) + 1800;
+			cache.data = Buffer.concat(cache.chunks);
+			cache.cache = true;
+			delete cache.chunks;
+			Audio.caches[cache.id] = cache;
+			Audio.queue[id][index].cache = true;
+			for (let i = 0; i < Audio.queue.length; i++) {
+				if (i != index && Audio.queue[id][i] == item) {
+					Audio.queue[id][i].cache = true;
+				}
+			}
+		});
 }
 
-Audio.playItem = function(item, id, immediately) {
+Audio.playItem = async function(item, id, immediately) {
 	const voice = Bot.bot.guilds.cache.get(id).me.voice
 	if (!this.connections[id] && voice.channelID != undefined) {
 		voice.setChannel(null);
@@ -1883,14 +1907,17 @@ Audio.playItem = function(item, id, immediately) {
 	}
 	if (this.dispatchers[id]) {
 		if (immediately == true) {
-			this.dispatcherss[id].destroy();
 			this.queue[id] = [];
-			this.queue[id].push(item);
+			if (!this.ytpl.validateURL(item.url)) {
+				this.queue[id].push(item);
+			}
 		}
 	} else {
 		if (!this.queue[id]) {
 			this.queue[id] = [];
-			this.queue[id].push(item);
+			if (!this.ytpl.validateURL(item.url)) {
+				this.queue[id].push(item);
+			}
 		}
 	}
 	switch (item.type) {
@@ -1900,33 +1927,52 @@ Audio.playItem = function(item, id, immediately) {
 			break;
 		case 'yt':
 			if (item.cache) {
-				this.dispatchers[id] = this.connections[id].play(item.local, item.options);
+				this.fs.writeFileSync(".//resources//"+id+".mp3", this.caches[item.id].data);
+				this.dispatchers[id] = this.connections[id].play(".//resources//"+id+".mp3", item.options);
 			} else {
-				this.dispatchers[id] = this.connections[id].play(this.ytdl(item.url), item.options);
-				this.loadInfo(item, 0, id);
+				if (this.ytpl.validateURL(item.url)) {
+					const playlist = await this.ytpl(item.url);
+					this.AddToQueuePL(playlist, item.options, item.requester, id);
+					if (this.queue[id][0].cache) {
+						this.fs.writeFileSync(".//resources//"+id+".mp3", this.caches[this.queue[id][0]].data);
+						this.dispatchers[id] = this.connections[id].play(".//resources//"+id+".mp3", this.queue[id][0].options);
+					} else {
+						this.dispatchers[id] = this.connections[id].play(await this.ytdl(this.queue[id][0].url), this.queue[id][0].options)
+					}
+				} else {
+					const video_id = this.ytdl.getURLVideoID(item.url);
+					this.queue[id][0].id = video_id;
+					if (this.caches[video_id] && this.caches[video_id].cache) {
+						this.queue[id][0].cache = true;
+						this.fs.writeFileSync(".//resources//"+id+".mp3", this.caches[item.id].data);
+						this.dispatchers[id] = this.connections[id].play(".//resources//"+id+".mp3", item.options);
+					} else {
+						this.dispatchers[id] = this.connections[id].play(await this.ytdl(item.url), item.options);
+						this.loadInfo(item, id, 0);
+					};
+				}
 			}
 			break;
 	}
-	this.dispatchers[id].on('speaking',function(talk) {
-		if (!talk && !Audio.dispatchers[id].paused) {
-			DBM.LeonZ.onStop(id);
-			if (Audio.queue[id][0].type == "yt" && item.cache) {
-				Audio.caches[id][item.id].expiresAt = Math.floor(new Date().getTime() / 1000) + 1800;
-				//Audio.startTimeout(item.local, id);
+	DBM.LeonZ.onPlay(item,id);
+	this.dispatchers[id].on('finish', () => {
+		DBM.LeonZ.onStop(id);
+		if (Audio.queue[id][0].type == "yt" && item.cache) {
+			if (this.fs.existsSync(".//resources//"+id+".mp3")) {
+				this.fs.unlinkSync(".//resources//"+id+".mp3");
 			}
-			if(Audio.loop[id] == false) {
-				Audio.queue[id].shift();
-			} else if (Audio.loop[id] == "queue") {
-				const firstItem = Audio.queue[id].shift();
-				Audio.queue[id].push(firstItem);
-			}
-			if (Audio.queue[id].length > 0) {
-				Audio.playNext(id);
-			} else {
-				Audio.dispatchers[id].destroy();
-			}
-		} else if (talk == 1) {
-			DBM.LeonZ.onPlay(item,id);
+			Audio.caches[item.id].expiresAt = Math.floor(new Date().getTime() / 1000) + 1800;
+		}
+		if(Audio.loop[id] == false) {
+			Audio.queue[id].shift();
+		} else if (Audio.loop[id] == "queue") {
+			const firstItem = Audio.queue[id].shift();
+			Audio.queue[id].push(firstItem);
+		}
+		if (Audio.queue[id].length > 0) {
+			Audio.playNext(id);
+		} else {
+			Audio.dispatchers[id].destroy();
 		}
 	})
 }
@@ -1951,7 +1997,7 @@ Audio.controlAudio = function(id,action,amount) {
 				play = parseInt(amount);
 				break;
 		}
-		if (play >= 0 && play < item.duration) {
+		if (play >= 0 && play < this.caches[item.id].duration) {
 			item.options.seek = play;
 			this.playItem(item,id)
 		} else {
@@ -1967,21 +2013,24 @@ Audio.playNext = function(id, forceSkip) {
 	if (forceSkip && this.queue[id].length > 1) {
 		this.queue[id].shift();
 	}
+	if (this.queue[id][0].options.seek != 0) {
+		this.queue[id][0].options.seek = 0;
+	}
 	const item = this.queue[id][0];
 	if (item) {
 		this.playItem(item, id);
 	}
 }
 
-Audio.startTimeout = function(path,id) {
-	const bot = this.bot;
-	bot.setTimeout(function(path,id) {
-		if (fs.existsSync(path)) {
-			if (Math.floor(new Date().getTime() / 1000) > this.caches[id]) {
-				fs.unlinkSync(path);
-			}
-		}
-	}.bind(this), 1800000);
+Audio.AddToQueuePL = function(array, options, requester, id) {
+	array.items.forEach((itemPL) => {
+		let item = {};
+		item.options = options;
+		item.requester = requester;
+		item.type = 'yt';
+		item.url = itemPL.url_simple;
+		this.addToQueue(item, id)
+	})
 }
 
 Audio.shuffleQueue = function(id) {
@@ -2018,8 +2067,9 @@ Audio.skipQueue = function(amount, id) {
 Audio.addToQueue = function(item, id) {
 	if(!this.queue[id]) this.queue[id] = [];
 	this.queue[id].push(item);
+	let length = this.queue[id].length -1;
 	if (item.type == "yt") {
-		this.loadInfo(item, this.queue[id].length-1, id);
+		this.loadInfo(item, id, length);
 	}
 };
 
@@ -2211,7 +2261,11 @@ Guild.prototype.addData = function(name, value) {
 	if(data[id][name] === undefined) {
 		this.setData(name, value);
 	} else {
-		this.setData(name, this.data(name) + value);
+		if (!isNaN(this.data(name)) && !isNaN(value)) {
+			this.setData(name, Number(this.data(name)) + value)
+		} else {
+			this.setData(name, this.data(name) + value);
+		}
 	}
 };
 

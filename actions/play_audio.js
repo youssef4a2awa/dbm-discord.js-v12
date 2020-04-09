@@ -74,8 +74,13 @@ module.exports = {
 		item.options.plp = 0;
 		item.options.highWaterMark = 20;
 		item.cache = false;
-		item.expire = Math.floor(new Date().getTime() / 1000) + 1800;
 		item.url = this.evalMessage(data.play, cache);
+		const requester = this.getMember(1, '', cache);
+		if (requester) {
+			item.requester = requester;
+		} else {
+			item.requester = 'unknown';
+		}
 		switch (parseInt(data.type)) {
 			case 0:
 				item.type = 'yt';
