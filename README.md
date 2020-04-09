@@ -1,5 +1,5 @@
 # ⚠ Warning 
-**PLEASE BACKUP YOUR BOT PROJECT FOLDER WE NEVER KNOW IF SOMETHING GOES WRONG ESPECIALLY DISCORD.JS V12.0.2 MIGHT BREAK YOUR BOT SO PLEASE BACK UP YOUR BOT FOLDER.**
+**PLEASE BACKUP YOUR BOT PROJECT FOLDER WE NEVER KNOW IF SOMETHING GOES WRONG ESPECIALLY DISCORD.JS V12.1.1 MIGHT BREAK YOUR BOT SO PLEASE BACK UP YOUR BOT FOLDER.**
 
 # 🤚 Backup 
 *If you're too lazy to backup your bot folder, Atleast backup these files:*
@@ -8,10 +8,20 @@
 
 # Requirments
 
-## Discord.JS version: V12.0.2
-* Install it by running `npm i discord.js` in your console.
 ## Node.js 12.0.0 or newer is required.
 * Install Node.js V12.6.1 [here](https://nodejs.org/dist/v12.16.1/node-v12.16.1-x64.msi)
+## Discord.JS version: V12.1.1
+* Install it by running `npm i discord.js` in your console.
+## ytdl-core version: V2.0.1
+* Install it by running `npm i ytdl-core` in your console.
+## ytsr version: V0.1.12
+* Install it by running `npm i ytsr` in your console.
+## ytpl version: V0.1.20
+* Install it by running `npm i ytpl` in your console.
+## canvas version: V2.6.1
+* Install it by running `npm i canvas` in your console.
+## opentype.js version: V1.1.0
+* Install it by running `npm i opentype.js` in your console.
 
 # Installation
 * Download the actions folder from above.
@@ -19,7 +29,7 @@
 * Copy the bot_v12.js file to your bot's folder
 
 # Running the bot
-Since dbm doesn't support Discord.js V12.0.2 you'll have to run the bot through Command prompt.
+Since dbm doesn't support Discord.js V12.1.1 you'll have to run the bot through Command prompt.
 
 # Running the bot in the Command Prompt
 This process requires [NodeJS](https://nodejs.org/dist/v12.16.1/node-v12.16.1-x64.msi) to be installed on your computer.
