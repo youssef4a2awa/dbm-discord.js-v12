@@ -113,7 +113,7 @@ module.exports = {
 			}
 
 			if(WrexMODS.checkURL(url)){
-				var request = WrexMODS.require('request')
+				//var request = WrexMODS.require('request')
 				request(url, function(err, res, html) {
 					if(err) throw err;
 					this.storeValue(html.trim(), storage, varName, cache);

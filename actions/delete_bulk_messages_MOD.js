@@ -171,7 +171,7 @@ module.exports = {
 		try {
 			eval(filter)
 		} catch (e) {
-			this.displayError(e, data, cache);
+			this.displayError(data, cache, e);
 			return;
 		}
 

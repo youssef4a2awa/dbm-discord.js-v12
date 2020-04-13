@@ -11,9 +11,9 @@ module.exports = {
     short_description: "Set bots activity and status.",
 
     subtitle: function (data) {
-        const activities = ["Playing", "Listening to", "Watching", "Streaming Twitch"];
+        const activities = ["Playing", "Listening to", "Watching", "Streaming Twitch", "Keep"];
 
-        const stats = ["Online", "Idle", "Invisible", "Do Not Disturb"];
+        const stats = ["Online", "Idle", "Invisible", "Do Not Disturb", "Keep"];
 
         return `${stats[data.stat]}, ${activities[data.activity]} ${data.nameText}`;
     },
@@ -150,8 +150,8 @@ action: function (cache) {
     }
 
     let obj = {};
-    obj.activity = {};
     if (nameText) {
+        obj.activity = {};
         obj.activity.name = nameText;
     }
     if (target) {

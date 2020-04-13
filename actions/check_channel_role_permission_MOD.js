@@ -4,11 +4,10 @@ name: "Check Channel Role Permission",
 section: "Channel Control",
 
 subtitle: function(data) {
-	const results = ["Continue Actions", "Stop Action Sequence", "Jump To Action", "Jump Forward Actions"];
+	const results = ["Continue Actions", "Stop Action Sequence", "Jump To Action", "Jump Forward Actions", "Jump to Anchor"];
 	return `If True: ${results[parseInt(data.iftrue)]} ~ If False: ${results[parseInt(data.iffalse)]}`;
 },
 
-//WTF?? FUCK THIS
 github: "LeonZ2019/DBM",
 author: "LeonZ",
 version: "1.1.0",
@@ -82,7 +81,6 @@ init: function() {
 },
 
 action: function(cache) {
-	const permission = require('discord.js');
 	const data = cache.actions[cache.index];
 	const storage = parseInt(data.channel);
 	const varName = this.evalMessage(data.varName, cache);
@@ -94,7 +92,6 @@ action: function(cache) {
 
 	const options = {};
 	options[data.permission] = data.state === "0" ? true : (data.state === "2" ? false : null);
-	const permissions = permission(6144);
 	let result = false;
 	if(role && role.id) {
 		if(Array.isArray(channel)) {

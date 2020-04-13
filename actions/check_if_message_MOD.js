@@ -11,7 +11,7 @@ module.exports = {
     short_description: "Checks if the message has the chosen condition.",
 
     subtitle: function(data) {
-        const results = ["Continue Actions", "Stop Action Sequence", "Jump To Action", "Jump Forward Actions"];
+        const results = ["Continue Actions", "Stop Action Sequence", "Jump To Action", "Jump Forward Actions", "Jump to Anchor"];
         return `If True: ${results[parseInt(data.iftrue)]} ~ If False: ${results[parseInt(data.iffalse)]}`;
     },
 

@@ -5,10 +5,10 @@ module.exports = {
 	section: "Bot Client Control",
 
 	subtitle: function(data) {
-		return `${data.afk === "0" ? "AFK" : "Not AFK"}`;
+		return data.status=="0" ? `AFK` : `Not AFK`;
 	},
 
-	fields: ["afk"],
+	fields: ["status"],
 
 	html: function(isEvent, data) {
 		return `
@@ -27,14 +27,10 @@ module.exports = {
 	action: function(cache) {
 		const botClient = this.getDBM().Bot.bot.user;
 		const data = cache.actions[cache.index];
-		const afk = parseInt(data.afk);
-		if(botClient && botClient.setAFK) {
-			botClient.setAFK(Boolean(afk === "0")).then(function() {
-				this.callNextAction(cache);
-			}.bind(this)).catch(this.displayError.bind(this, data, cache));
-		} else {
+		const afk = Boolean(data.status == "0");
+		botClient.setAFK(afk).then(function() {
 			this.callNextAction(cache);
-		}
+		}.bind(this)).catch(this.displayError.bind(this, data, cache));
 	},
 
 	mod: function(DBM) {

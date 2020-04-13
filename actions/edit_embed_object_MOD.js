@@ -75,7 +75,7 @@ module.exports = {
 			</div>
 			<div id="Input2" style="display: none; float: right; width: 60%;">
 				Description:<br>
-				<input id="description" class="round" type="text">
+				<textarea id="description" rows="1" style="height: 28px; width: 90%; font-family: monospace; white-space: nowrap; resize: none;"></textarea>
 			</div>
 		</div><br><br><br>
 		<div style="padding-top: 8px;">

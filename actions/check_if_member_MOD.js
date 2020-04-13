@@ -11,7 +11,7 @@ module.exports = {
 	short_description: "Check if a member meets the conditions.",
 
 	subtitle: function(data) {
-		const results = ["Continue Actions", "Stop Action Sequence", "Jump To Action", "Jump Forward Actions"];
+		const results = ["Continue Actions", "Stop Action Sequence", "Jump To Action", "Jump Forward Actions", "Jump to Anchor"];
 		return `If True: ${results[parseInt(data.iftrue)]} ~ If False: ${results[parseInt(data.iffalse)]}`;
 	},
 
@@ -48,6 +48,7 @@ module.exports = {
 				<option value="8">Is Deafened?</option>
 				${ !isEvent && '<option value="9">Is Command Author?</option>'}
 				${ !isEvent && '<option value="10">Is Current Server Owner?</option>'}
+				<option value="11">Is Streaming on Discord?</option>
 			</select>
 		</div>
 		<div id="varNameContainer2" style="display: none; float: right; width: 60%;">

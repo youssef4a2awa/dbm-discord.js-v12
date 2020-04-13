@@ -12,6 +12,68 @@ DBM.modifyVersion = "1.0.0";
 const DiscordJS = DBM.DiscordJS = require('discord.js');
 
 //---------------------------------------------------------------------
+// Console
+// Handler console.log() and console.error()
+//---------------------------------------------------------------------
+
+const fs = require('fs');
+const util = require('util');
+let today = new Date().toLocaleDateString().replace(/\//g,'_');
+
+if (!fs.existsSync('./logs')) {
+	fs.mkdirSync('./logs')
+}
+
+saveLogs = function (name, endsWith) {
+	if (fs.existsSync('./logs/'+name) && fs.readFileSync('./logs/'+name).length != 0) {
+		let num = 1;
+		while (fs.existsSync('./logs/'+today+'_'+num+endsWith)) {
+			num++;
+		}
+		fs.copyFileSync('./logs/'+name,'./logs/'+today+'_'+num+endsWith);
+		fs.createWriteStream('./logs/'+name);
+	}
+}
+
+saveLogs('latest.log', '.log')
+saveLogs('error.log', '_error.log')
+
+let error = fs.createWriteStream('./logs/error.log')
+let log = fs.createWriteStream('./logs/latest.log')
+
+console.log = function () {
+	let today2 = new Date().toLocaleDateString().replace(/\//g,'_');
+	if (today2 != today) {
+		saveLogs('latest.log', '.logs')
+	}
+	today = today2;
+	process.stdout.write(util.format.apply(null, arguments) + '\n');
+	if (!fs.existsSync('./logs/latest.log')) {
+		log = fs.createWriteStream('./logs/latest.log')
+	}
+	log.write('[' + new Date().toLocaleTimeString() + '] ' + util.format.apply(null, arguments) + '\n');
+}
+
+console.error = function () {
+	let a = 0;
+	let today2;
+	if (a != 0) {
+		today2 = new Date().toLocaleDateString().replace(/\//g,'_');
+	} else {
+		today2 = new Date().toLocaleDateString().replace(/\//g,'_');
+	}
+	if (today2 != today) {
+		saveLogs('error	.log', '_error.logs')
+	}
+	today = today2;
+	process.stderr.write(util.format.apply(null, arguments) + '\n');
+	if (!fs.existsSync('./logs/error.log')) {
+		error = fs.createWriteStream('./logs/error.log')
+	}
+	error.write('[' + new Date().toLocaleTimeString() + '] ' + util.format.apply(null, arguments) + '\n');
+}
+
+//---------------------------------------------------------------------
 // Bot
 // Contains functions for controlling the bot.
 //---------------------------------------------------------------------
@@ -519,25 +581,21 @@ Actions.callNextAction = function(cache) {
 	}
 };
 
-Actions.getErrorString = function(data, cache, args) {
+Actions.getErrorString = function(data, cache) {
 	const result = this.getName(cache);
-	const type = data.permissions ? 'Command' : 'Event';
-	if (args) {
-		return `Error with ${type} "${result.name}" for Action Name "${data.name}", Action #${cache.index + 1}`;
-	} else {
-		return `Error with ${type} "${result.name}" for Action Name "${data.name}", Action #${cache.index + 1}`;
-	}
+	const type = result.permissions ? 'Command' : 'Event';
+	return `Error with ${type} "${result.name}" for Action Name "${data.name}", Action #${cache.index + 1}`;
 };
 
-Actions.displayError = function(data, cache, err, args) {
-	const dbm = this.getErrorString(data, cache, args);
+Actions.displayError = function(data, cache, err) {
+	const dbm = this.getErrorString(data, cache);
 	console.error(dbm + ":\n" + err);
 	Events.onError(dbm, err.stack ? err.stack : err, cache);
 };
 
 Actions.getName = function(cache) {
 	const allData = Files.data.commands.concat(Files.data.events);
-	let action;
+	let result;
 	Object.keys(allData).forEach(function(cmd) {
 		if (allData[cmd]) {
 			if (JSON.stringify(allData[cmd].actions) == JSON.stringify(cache.actions)) {
@@ -571,14 +629,13 @@ Actions.getAction = function(content, cache) {
 
 Actions.anchorJump = function(id, cache) {
 	const actions = cache.actions;
-	const anchorId = id;
-	const anchorIndex = actions.findIndex((a) => a.name === "Create Anchor" && a.anchor_id === anchorId);
+	const anchorIndex = actions.findIndex((a) => a.name === "Create Anchor" && a.anchor_id === id);
 	if (anchorIndex === -1) {
 		console.error('There was not an anchor found with that exact anchor ID!');
-		this.callNextAction(cache);
 	} else {
 		cache.index = anchorIndex - 1;
 	};
+	this.callNextAction(cache);
 };
 
 Actions.getSendTarget = function(type, varName, cache) {
@@ -915,7 +972,6 @@ Actions.storeValue = function(value, type, varName, cache) {
 };
 
 Actions.executeResults = function(result, data, cache) {
-	const errors = {'404': 'There was not an anchor found with that exact anchor ID!'};
 	if(result) {
 		const type = parseInt(data.iftrue);
 		switch(type) {
@@ -1123,7 +1179,6 @@ Events.onError = function(text, text2, cache) {
 
 const Canvas = require('canvas');
 const openType = require('opentype.js');
-const fs = require("fs");
 
 const CanvasJS = DBM.CanvasJS = {};
 
@@ -1543,16 +1598,6 @@ Files.dataFiles = [
 Files.startBot = function() {
 	const fs = require('fs');
 	const path = require('path');
-	/*
-	if(process.env['IsDiscordBotMakerTest'] === 'true') {
-		Actions.location = process.env['ActionsDirectory'];
-		this.initBotTest();
-	} else if(process.argv.length >= 3 && fs.existsSync(process.argv[2])) {
-		Actions.location = process.argv[2];
-	} else {
-		Actions.location = path.join(__dirname, 'actions');
-	}
-	*/
 	Actions.actionsLocation = path.join(__dirname, 'actions');
 	Actions.eventsLocation = path.join(__dirname, 'events');
 	Actions.extensionsLocation = path.join(__dirname, 'extensions');

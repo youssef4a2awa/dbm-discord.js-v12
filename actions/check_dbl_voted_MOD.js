@@ -11,7 +11,7 @@ module.exports = {
 	short_description: "Check Voted Status of User on DBL",
 
 	subtitle: function(data) {
-		const results = ["Continue Actions", "Stop Action Sequence", "Jump To Action", "Jump Forward Actions"];
+		const results = ["Continue Actions", "Stop Action Sequence", "Jump To Action", "Jump Forward Actions", "Jump to Anchor"];
 		return `If True: ${results[parseInt(data.iftrue)]} ~ If False: ${results[parseInt(data.iffalse)]}`;
 	},
 
@@ -61,7 +61,6 @@ module.exports = {
 
 	action: function(cache) {
 		const data = cache.actions[cache.index];
-		const userid = this.evalMessage(data.userid, cache);
 		const apitoken = this.evalMessage(data.apitoken, cache);
 		const type = parseInt(data.member);
 		const varName = this.evalMessage(data.varName, cache);

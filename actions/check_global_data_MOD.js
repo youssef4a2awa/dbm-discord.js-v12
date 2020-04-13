@@ -5,7 +5,7 @@ module.exports = {
 	section: "Deprecated",
 
 	subtitle: function(data) {
-		const results = ["Continue Actions", "Stop Action Sequence", "Jump To Action", "Jump Forward Actions"];
+		const results = ["Continue Actions", "Stop Action Sequence", "Jump To Action", "Jump Forward Actions", "Jump to Anchor"];
 		return `If True: ${results[parseInt(data.iftrue)]} ~ If False: ${results[parseInt(data.iffalse)]}`;
 	},
 
@@ -15,7 +15,7 @@ module.exports = {
 
 	short_description: "Check if a Global Data Value meets the conditions",
 
-	fields: ["dataName", "comparison", "value", "iftrue", "iftrueVal", "iffalse", "iffalseVal"],
+	fields: ["dataName", "comparison", "value", "iftrue", "iftrueVal", "iffalse", "iffalseVal", "Jump to Anchor"],
 
 	html: function(isEvent, data) {
 		return `

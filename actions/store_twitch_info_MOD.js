@@ -538,7 +538,7 @@ module.exports = {
 		const data = cache.actions[cache.index];
 		const _this = this;
 		const WrexMODS = this.getWrexMods();
-		const request = WrexMODS.require('request');
+		//const request = WrexMODS.require('request');
 
 		const input = this.evalMessage(data.input, cache);
 		const clientID = this.evalMessage(data.clientid, cache);

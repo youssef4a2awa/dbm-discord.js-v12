@@ -86,7 +86,7 @@ module.exports = {
             this.storeValue(result, storage3, varName3, cache);
             this.callNextAction(cache);
         } catch (err) {
-            this.displayError(err);
+            this.displayError(data, cache, err);
         }
         this.callNextAction(cache);
     },

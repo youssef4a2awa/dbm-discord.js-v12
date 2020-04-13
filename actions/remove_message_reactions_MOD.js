@@ -1,4 +1,4 @@
-	module.exports = {
+module.exports = {
 
 		name: "Clear reactions from message",
 
@@ -54,13 +54,13 @@
 			const varName = this.evalMessage(data.varName, cache);
 			const message = this.getMessage(storage, varName, cache);
 			if(Array.isArray(message)) {
-				this.callListFunc(message.reactions.cache, 'remove', []).then(()=> {
+				this.callListFunc(message.reactions, 'removeAll', []).then(function () {
 					this.callNextAction(cache);
-				}).bind(this);
-			} else if(message && message.clearReactions) {
-				message.reactions.cache.remove().then(()=> {
+				}.bind(this));
+			} else if(message && message.reactions.removeAll) {
+				message.reactions.removeAll().then(function () {
 					this.callNextAction(cache);
-				}).bind(this).catch(this.displayError.bind(this, data, cache));
+				}.bind(this)).catch(this.displayError.bind(this, data, cache));
 			} else {
 				this.callNextAction(cache);
 			}

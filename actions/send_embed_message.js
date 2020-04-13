@@ -37,9 +37,9 @@ module.exports = {
             Variable Name:<br>
             <input id="varName" class="round" type="text" list="variableList">
         </div><br><br><br>
-        <div style="float: left; padding-top: 4px; width: 42%; height: 30px">
+        <div style="float: left; padding-top: 4px; width: 70%;">
             Message Content:<br>
-            <input id="messageContent" class="round" type="text" placeholder="Leave blank to ignore...">
+            <textarea id="messageContent" rows="1" style="height: 28px; width: 100%; font-family: monospace; white-space: nowrap; resize: none;" placeholder="Leave blank to ignore..."></textarea>
         </div><br><br><br>
     <div style="padding-top: 8px; float: left; width: 35%;">
         Send To:<br>

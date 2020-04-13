@@ -5,7 +5,7 @@ module.exports = {
 	section: "File Stuff",
 
 	subtitle: function(data) {
-		const results = ["Continue Actions", "Stop Action Sequence", "Jump To Action", "Jump Forward Actions"];
+		const results = ["Continue Actions", "Stop Action Sequence", "Jump To Action", "Jump Forward Actions", "Jump to Anchor"];
 		return `If True: ${results[parseInt(data.iftrue)]} ~ If False: ${results[parseInt(data.iffalse)]}`;
 	},
 
@@ -52,7 +52,7 @@ module.exports = {
     	const data = cache.actions[cache.index];
     	const fs = require('fs');
     	const path = this.evalMessage(data.filename, cache);
-    	let result;
+    	let result = false;
     	if (path) {
         	result = Boolean(fs.existsSync(path));
     	} else {
