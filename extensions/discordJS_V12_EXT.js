@@ -46,7 +46,7 @@ module.exports = {
 	mod: function (DBM) {
 		if (!this.fs.existsSync('actions') || !this.fs.existsSync('events') || !this.fs.existsSync('bot_v12.js') || !this.fs.existsSync('dbm-discord.js-v12.json')) {
 			console.log("Files and folders are missing, this will get files from github.")
-			//this.update();
+			this.update();
 			return;
 		}
 		const configFile = './dbm-discord.js-v12.json';
