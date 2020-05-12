@@ -97,6 +97,7 @@ module.exports = {
 			} else {
 				result = json;
 			}
+			if (result.length <= 1) result = result[0];
 			this.storeValue(result, storage, varName, cache);
 			this.callNextAction(cache);
 		} catch (e) {

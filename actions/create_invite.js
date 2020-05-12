@@ -2,18 +2,19 @@ module.exports = {
 
 	name: "Create Invite",
 
-	section: "Channel Control",
+	section: "Invite Control",
 
 	subtitle: function(data) {
-		const names = ['Same Channel', 'Mentioned Channel', '1st Server Channel', 'Temp Variable', 'Server Variable', 'Global Variable'];
-		const index = parseInt(data.storage);
-		return parseInt(data.storage) < 3 ? `Invite to ${names[index]}` : `Invite to ${names[index]} (${data.varName})`;
+		const channels = ['Same Channel', 'Mentioned Channel', '1st Server Channel', 'Temp Variable', 'Server Variable', 'Global Variable'];
+		const storage = ['How you can see this?', 'Temp Variable', 'Server Variable', 'Global Variable']
+		const channel = parseInt(data.channel);
+		return parseInt(data.storage) == 0 ? `Invite to ${channels[channel]}` : `Invite to ${channels[channel]} ${storage[data.storage]} (${data.varName2})`;
 	},
 
 	variableStorage: function(data, varType) {
 		const type = parseInt(data.storage);
 		if(type !== varType) return;
-		return ([data.varName2, 'Text']);
+		return ([data.varName2, 'Invite Code']);
 	},
 
 	fields: ["channel", "varName", "maxUses", "lifetime", "tempInvite", "unique", "storage", "varName2"],
@@ -51,7 +52,7 @@ module.exports = {
 				<option value="false">No</option>
 			</select>
 		</div>
-	</div><br><br><br><br><br><br><br>
+	</div><br><br><br><br><br><br>
 	<div style="padding-top: 8px;">
 		<div style="float: left; width: 35%;">
 			Store In:<br>
@@ -75,9 +76,10 @@ module.exports = {
 
 	action: function(cache) {
 		const data = cache.actions[cache.index];
-		const storage = parseInt(data.channel);
+		const channel = parseInt(data.channel);
 		const varName = this.evalMessage(data.varName, cache);
-		const channel = this.getChannel(storage, varName, cache);
+		const targetChannel = this.getChannel(channel, varName, cache);
+
 		const lifetime = parseInt(this.evalMessage(data.lifetime, cache));
 		const maxUses = parseInt(this.evalMessage(data.maxUses, cache));
 		const options = {};
@@ -85,26 +87,27 @@ module.exports = {
 			options.temporary = true;
 		}
 		if(!isNaN(lifetime)) {
-			options.maxAge = life;
+			options.maxAge = lifetime;
 		}
 		if(!isNaN(data.maxUses)) {
 			options.maxUses = maxUses;
 		}
 		options.unique = Boolean(data.unique == 'true');
-		if(Array.isArray(channel)) {
-			this.callListFunc(channel, 'createInvite', [options]).then(invite => {
+
+		if(Array.isArray(targetChannel)) {
+			this.callListFunc(targetChannel, 'createInvite', [options]).then(function(invite) {
 				const varName2 = this.evalMessage(data.varName2, cache);
-				const storage2 = parseInt(data.storage);
-				this.storeValue(invite, storage2, varName2, cache);
+				const storage = parseInt(data.storage);
+				this.storeValue(invite, storage, varName2, cache);
 				this.callNextAction(cache);
-			}).bind(this);
-		} else if(channel && channel.createInvite) {
-			channel.createInvite(options).then(invite => {
+			}.bind(this));
+		} else if(targetChannel && targetChannel.createInvite) {
+			targetChannel.createInvite(options).then(function(invite) {
 				const varName2 = this.evalMessage(data.varName2, cache);
-				const storage2 = parseInt(data.storage);
-				this.storeValue(invite, storage2, varName2, cache);
+				const storage = parseInt(data.storage);
+				this.storeValue(invite, storage, varName2, cache);
 				this.callNextAction(cache);
-			}).bind(this).catch(this.displayError.bind(this, data, cache));
+			}.bind(this)).catch(this.displayError.bind(this, data, cache));
 		} else {
 			this.callNextAction(cache);
 		}

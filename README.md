@@ -10,21 +10,22 @@
 
 ## Node.js 12.0.0 or newer is required.
 * Install Node.js V12.6.1 [here](https://nodejs.org/dist/v12.16.1/node-v12.16.1-x64.msi)
-## Discord.JS version: V12.1.1
+## Discord.JS version: V12.2.0
 * Install it by running `npm i discord.js` in your console.
 ## ytdl-core version: V2.0.1
 * Install it by running `npm i ytdl-core` in your console.
-## ytsr version: V0.1.12
+## ytsr version: V0.1.13
 * Install it by running `npm i ytsr` in your console.
-## ytpl version: V0.1.20
+## ytpl version: V0.1.21
 * Install it by running `npm i ytpl` in your console.
 ## canvas version: V2.6.1
 * Install it by running `npm i canvas` in your console.
-## opentype.js version: V1.1.0
+## opentype.js version: V1.3.3
 * Install it by running `npm i opentype.js` in your console.
 
 # Installation
 * Download the actions folder from above.
+* Rename actions folder to actions_old if you have discord.js v11 with original dbm mod.
 * Copy and paste the actions folder to your bot's folder (Make sure to backup previous actions folder).
 * Copy the bot_v12.js file to your bot's folder
 

@@ -8,12 +8,6 @@ module.exports = {
 		return `${data.invite}`;
 	},
 
-	author: "MrGold",
-
-	version: "1.X.X",
-
-	short_description: "Finds an invite by code or URL",
-
 	variableStorage: function(data, varType) {
 		const type = parseInt(data.storage);
 		if(type !== varType) return;
@@ -24,16 +18,10 @@ module.exports = {
 
 	html: function(isEvent, data) {
 		return `
-		<div>
-			<p>
-				<u>Mod Info:</u><br>
-				Created by MrGold
-			</p>
-		</div><br>
 	<div>
 		<div style="padding-top: 8px;">
 			Source Invite:<br>
-			<textarea class="round" id="invite" rows="1" placeholder="Code or URL | e.g abcdef or discord.gg/abcdef" style="width: 99%; font-family: monospace; white-space: nowrap; resize: none;"></textarea>
+			<input class="round" id="invite" placeholder="Code or URL | e.g abcdef or discord.gg/abcdef" type="text">
 		</div><br>
 	</div>
 	<div style="padding-top: 8px;">
@@ -58,14 +46,14 @@ module.exports = {
 		const invite = this.evalMessage(data.invite, cache);
 		const client = this.getDBM().Bot.bot;
 
-		client.fetchInvite(invite).catch(this.displayError(data,cache,err)).then(doThis.bind(this));
-
-		function doThis(invite){
-	 	const storage = parseInt(data.storage);
-     	const varName = this.evalMessage(data.varName, cache);
-	 	this.storeValue(invite, storage, varName, cache);
-	 	this.callNextAction(cache);
-		}
+		client.fetchInvite(invite).then(function(invite) {
+			const storage = parseInt(data.storage);
+			const varName = this.evalMessage(data.varName, cache);
+			this.storeValue(invite, storage, varName, cache);
+			this.callNextAction(cache);
+		}.bind(this)).catch(err => {
+			this.displayError(data,cache,err)
+		});
 	},
 
 	mod: function(DBM) {

@@ -42,6 +42,7 @@ module.exports = {
 	},
 
 	mod: function(DBM) {
+		DBM.Actions["Send Message to Console (Logs)"] = DBM.Actions["Send Message to Console"];
 	}
 
 };

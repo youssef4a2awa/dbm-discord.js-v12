@@ -64,7 +64,6 @@ module.exports = {
 		const path = parseInt(data.path);
 		var _this = this
 		var stor = storage + varName
-		console.log(stor)
 		const WrexMODS = this.getWrexMods();
 		const {
 			JSONPath

@@ -74,6 +74,7 @@ module.exports = {
 				<option value="11">Video Likes</option>
 				<option value="12">Video Dislikes</option>
 				<option value="13">Video View Count</option>
+				<option value="14">Video Author Subscriber Count</option>
 			</select>
 		</div>
 	</div>
@@ -153,6 +154,8 @@ module.exports = {
 			case 13:
 				result = object.views;
 				break;
+			case 14:
+				result = object.author.subscriber_count;
 		}
     	if (result !== undefined) {
         	const storage2 = parseInt(data.storage2);

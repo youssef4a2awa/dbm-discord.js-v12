@@ -11,7 +11,7 @@ module.exports = {
 
 	github: "LeonZ2019/DBM",
 	author: "LeonZ",
-	version: "1.2.0",
+	version: "1.3.0",
 
 	variableStorage: function(data, varType) {
 		const type = parseInt(data.storage);
@@ -19,7 +19,7 @@ module.exports = {
 		return ([data.varName, 'Embed Message']);
 	},
 
-	fields: ["storage", "varName", "Edit0", "Edit1", "Edit2", "Edit3", "Edit4", "Edit5", "Edit6", "Edit7", "Edit8", "Edit9", "Edit10", "Edit11", "Edit12", "title", "url", "description", "color", "imageUrl", "imageUrl2", "thumbUrl", "thumbUrl2", "author", "authorUrl", "authorIcon", "footer", "footerIcon", "timestamp", "fieldNum", "fieldName", "fieldDescription", "fieldInline"],
+	fields: ["storage", "varName", "Edit0", "Edit1", "Edit2", "Edit3", "Edit4", "Edit5", "Edit6", "Edit7", "Edit8", "Edit9", "Edit10", "Edit11", "Edit12", "Edit13", "title", "url", "description", "color", "imageUrl", "imageUrl2", "thumbUrl", "thumbUrl2", "author", "authorUrl", "authorIcon", "footer", "footerIcon", "timestamp", "fieldNum", "editFieldName", "fieldName", "fieldDescription", "fieldInline"],
 
 	html: function(isEvent, data) {
 		return `
@@ -71,13 +71,14 @@ module.exports = {
 					<option value=0 selected>Keep Content</option>
 					<option value=1>Edit Content</option>
 					<option value=2>Clear Content</option>
+					<option value=3>Add Content</option>
 				</select>
 			</div>
-			<div id="Input2" style="display: none; float: right; width: 60%;">
-				Description:<br>
-				<textarea id="description" rows="1" style="height: 28px; width: 90%; font-family: monospace; white-space: nowrap; resize: none;"></textarea>
-			</div>
 		</div><br><br><br>
+		<div id="Input2" style="padding-top: 8px; display: none;">
+			Description:<br>
+			<textarea id="description" rows="3" style="width: 99%; font-family: monospace; white-space: nowrap; resize: none;"></textarea>
+		</div>
 		<div style="padding-top: 8px;">
 			<div style="float: left; width: 35%;">
 				Edit Color:<br>
@@ -108,7 +109,7 @@ module.exports = {
 			</div>
 		</div><br><br><br>
 		<div id="Input4a" style="display: none; padding-top: 8px;">
-		<div style="float: left; width: 105%;">
+			<div style="float: left; width: 105%;">
 				Name With Extension:<br>
 				<input id="imageUrl2" class="round" type="text" placeholder="name.extension">
 			</div><br><br><br>
@@ -215,42 +216,58 @@ module.exports = {
 				</select>
 			</div>
 			<div id="Input11" style="display: none; float: right; width: 60%;">
-				URL Timestamp:<br>
+				Timestamp:<br>
 				<input id="timestamp" class="round" type="text">
 			</div>
 		</div><br><br><br>
 		<div style="padding-top: 8px;">
 			<div style="float: left; width: 35%;">
-				Edit Edit Field:<br>
+				Edit Field:<br>
 				<select id="Edit12" class="round" onchange="glob.onChange12(this)">
 					<option value=0 selected>Keep Content</option>
-					<option value=1>Edit Content</option>
+					<option value=1>Edit Field</option>
 					<option value=2>Delete Field</option>
 					<option value=3>Delete All Fields</option>
 					<option value=4>Add Field</option>
 				</select><br>
 			</div>
-			<div id="Input12" style="display: none; float: right; width: 60%;">
+			<div id="Input13" style="padding-left: 3%; display: none; float: left; width: 35%;">
+				Field Position:<br>
+				<select id="Edit13" class="round" onchange="glob.onChange13(this)">
+					<option value=0 selected>At Front</option>
+					<option value=1>At End</option>
+					<option value=2>At Specific Position</option>
+				</select><br>
+			</div>
+			<div id="Input12" style="padding-left: 3%; display: none; float: left; width: 30%;">
 				Field Number:<br>
 				<input id="fieldNum" class="round" type="text"><br>
 			</div>
-		</div><br><br><br>
-		<div id="Input13" style="display: none;">
+		</div>
+		<div id="Input14" style="padding-top: 8px; display: none;">
 			<div style="float: left; width: 32%;">
 				Edit Field Name:<br>
-				<input id="fieldName" class="round" type="text"><br>
+				<select id="editFieldName" class="round" onchange="glob.onChange14(this)">
+					<option value=0 selected>Keep</option>
+					<option value=1>Edit</option>
+				</select>
 			</div>
-			<div style="padding-left: 3%; float: left; width: 32%;">
-				Edit Field Value:<br>
-				<input id="fieldDescription" class="round" type="text"><br>
+			<div style="padding-left: 3%; float: left; width: 35%;">
+				New Field Name:<br>
+				<input id="fieldName" class="round" type="text"><br>
 			</div>
 			<div style="padding-left: 3%; float: left; width: 32%;">
 				Edit Field Inline:<br>
 				<select id="fieldInline" class="round">
-					<option value=0 selected>Keep Inline</option>
 					<option value=1>Yes</option>
-					<option value=2>No</option>
+					<option value=2 selected>No</option>
 				</select><br>
+			</div>
+		</div>
+		<div id="Input15" style="padding-top: 8px; display: none;">
+			<div style="float: right; width: 100%;">
+				Edit Field Value:<br>
+				<textarea id="fieldDescription" rows="4" style="width: 99%; font-family: monospace; white-space: nowrap; resize: none;"></textarea>
 			</div>
 		</div>
 	</div>`
@@ -277,8 +294,11 @@ module.exports = {
 		const Input12 = document.getElementById('Input12');
 		const Input13 = document.getElementById('Input13');
 		const Input14 = document.getElementById('Input14');
+		const Input15 = document.getElementById('Input15');
 		const fieldInline = document.getElementById('fieldInline');
-
+		const fieldName = document.getElementById('fieldName');
+		const editFieldName = document.getElementById('editFieldName');
+		const fieldDescription = document.getElementById('fieldDescription');
 		glob.onChange0 = function(Edit0) {
 			switch(parseInt(Edit0.value)) {
 				case 0:
@@ -308,6 +328,7 @@ module.exports = {
 					Input2.style.display = 'none';
 					break;
 				case 1:
+				case 3:
 					Input2.style.display = null;
 					break;
 			}
@@ -353,7 +374,7 @@ module.exports = {
 					break;
 				case 1:
 					Input5.style.display = null;
-					Input5placeholder.innerHTML = 'Image URL:';
+					Input5placeholder.innerHTML = 'Thumbnail URL:';
 					document.getElementById('thumbUrl').value = '';
 					Input5a.style.display = 'none';
 					break;
@@ -432,34 +453,87 @@ module.exports = {
 					break;
 			}
 		}
-
 		glob.onChange12 = function(Edit12) {
 			switch(parseInt(Edit12.value)) {
 				case 0:
 				case 3:
 					Input12.style.display = 'none';
 					Input13.style.display = 'none';
+					Input14.style.display = 'none';
+					Input15.style.display = 'none';
 					break;
 				case 1:
-					Input12.style.display = null;
+					fieldDescription.placeholder = "Leave it blank to keep the field description.";
 					Input13.style.display = null;
+					Input14.style.display = null;
+					Input15.style.display = null;
 					if (fieldInline.length !== 3) {
 						var option = document.createElement('option');
 						option.value = 0;
 						option.innerHTML = "Keep Inline";
 						fieldInline.prepend(option);
 					}
+					if (editFieldName.length != 2) {
+						editFieldName.remove(0);
+						var option1 = document.createElement('option');
+						var option2 = document.createElement('option');
+						if (editFieldName.length != 2) {
+							option1.value = 0;
+							option2.value = 1;
+							option1.innerHTML = "Keep";
+							option2.innerHTML = "Edit";
+							editFieldName.prepend(option1);
+							editFieldName.prepend(option2);
+						}
+					}
+					editFieldName.value = 1;
 					break;
 				case 2:
-					Input12.style.display = null;
-					Input13.style.display = 'none';
+					Input13.style.display = null;
+					Input14.style.display = 'none';
+					Input15.style.display = 'none';
 					break;
 				case 4:
-					Input12.style.display = null;
+					fieldDescription.placeholder = "";
 					Input13.style.display = null;
+					Input14.style.display = null;
+					Input15.style.display = null;
 					if (fieldInline.length === 3) {
 						fieldInline.remove(0);
 					}
+					if (editFieldName.length == 2) {
+						editFieldName.remove(0);
+						editFieldName.remove(0);
+						var option = document.createElement('option');
+						option.value = 2;
+						option.innerHTML = "Add";
+						editFieldName.prepend(option);
+					}
+					fieldName.disabled = false;
+					break;
+			}
+		}
+		glob.onChange13 = function (Edit13) {
+			switch(parseInt(Edit13.value)) {
+				case 0:
+				case 1:
+					Input12.style.display = 'none';
+					break;
+				case 2:
+					Input12.style.display = null;
+					break;
+			}
+		}
+		glob.onChange14 = function (editFieldName) {
+			switch(parseInt(editFieldName.value)) {
+				case 0:
+					fieldName.value = '';
+					fieldName.disabled = true;
+					break;
+				case 1:
+				case 2:
+				default:
+					fieldName.disabled = false;
 					break;
 			}
 		}
@@ -477,6 +551,7 @@ module.exports = {
 		glob.onChange10(document.getElementById('Edit10'));
 		glob.onChange11(document.getElementById('Edit11'));
 		glob.onChange12(document.getElementById('Edit12'));
+		glob.onChange13(document.getElementById('Edit13'));
 	},
 
 	action: function(cache) {
@@ -501,6 +576,7 @@ module.exports = {
 		const Edit10 = parseInt(data.Edit10);
 		const Edit11 = parseInt(data.Edit11);
 		const Edit12 = parseInt(data.Edit12);
+		const Edit13 = parseInt(data.Edit13);
 		const title = this.evalMessage(data.title, cache);
 		const url = this.evalMessage(data.url, cache);
 		const description = this.evalMessage(data.description, cache);
@@ -519,6 +595,8 @@ module.exports = {
 		const fieldName = this.evalMessage(data.fieldName, cache);
 		const fieldDescription = this.evalMessage(data.fieldDescription, cache);
 		const fieldInline = parseInt(data.fieldInline);
+		const editFieldName = parseInt(data.editFieldName);
+
 		switch(Edit0) {
 			case 1:
 				embed.setTitle(title);
@@ -541,6 +619,20 @@ module.exports = {
 				break;
 			case 2:
 				embed.description = undefined;
+				break;
+			case 3:
+				if (embed.description != undefined) {
+					embed.description += description;
+				} else {
+					embed.setDescription(description);
+				}
+				break;
+			case 4:
+				if (typeof embed.description == "undefined") {
+					embed.setDescription(description);
+				} else {
+					embed.description += description
+				}
 				break;
 		}
 		switch(Edit3) {
@@ -646,26 +738,84 @@ module.exports = {
 		}
 		switch(Edit12) {
 			case 1:
-				if(embed.fields.length > fieldNum) {
-					embed.fields[fieldNum].name = fieldName;
-					embed.fields[fieldNum].value = fieldDescription;
-					switch(fieldInline) {
+				if (embed.fields.length > 0) {
+					let position = false;
+					switch(Edit13) {
+						case 0:
+							position = 0;
+							break;
 						case 1:
-							embed.fields[fieldNum].inline = true;
+							position = embed.fields.length - 1;
 							break;
 						case 2:
-							embed.fields[fieldNum].inline = false;
+							if (embed.fields.length > fieldNum) {
+								position = fieldNum;
+							}
 							break;
 					}
+					if (!!position) {
+						console.error("Field position not found.");
+						return;
+					} else {
+						if (editFieldName == 1) {
+							embed.fields[position].name = fieldName;
+						}
+						if (fieldInline != 0) {
+							embed.fields[position].inline = Boolean(fieldInline == 1);
+						}
+						if (typeof fieldDescription !== 'undefined') {
+							embed.fields[position].value = fieldDescription;
+						}
+					}
+				} else {
+					console.error("Embed field is empty.")
+					return;
 				}
 				break;
 			case 2:
-				embed.fields.splice(fieldNum,1);
+				if (embed.fields.length > 0) {
+					let position = false;
+					switch(Edit13) {
+						case 0:
+							position = 0;
+							break;
+						case 1:
+							position = embed.fields.length - 1;
+							break;
+						case 2:
+							if (embed.fields.length > fieldNum) {
+								position = fieldNum;
+							}
+							break;
+					}
+					if (!!position) {
+						embed.fields.splice(fieldNum,1);
+					}
+				} else {
+					console.error("Embed field is empty.")
+					return;
+				}
 				break;
 			case 3:
 				embed.fields = [];
 				break;
 			case 4:
+				let position = false;
+				switch(Edit13) {
+					case 0:
+						position = 0;
+						break;
+					case 1:
+						position = embed.fields.length - 1;
+						break;
+					case 2:
+						if (embed.fields.length > fieldNum) {
+							position = fieldNum;
+						} else {
+							position = embed.fields.length - 1;
+						}
+						break;
+				}
 				let field = {};
 				field.name = fieldName;
 				field.value = fieldDescription;
@@ -678,7 +828,7 @@ module.exports = {
 						field.inline = false;
 						break;
 				}
-				embed.fields.splice(fieldNum, 0, field)
+				embed.fields.splice(position, 0, field)
 				break;
 		}
 		this.storeValue(embed, storage, varName, cache);

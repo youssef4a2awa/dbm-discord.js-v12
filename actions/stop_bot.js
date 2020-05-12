@@ -36,6 +36,7 @@ action: function(cache) {
 	const data = cache.actions[cache.index];
 	console.log('Stopped bot!');
 	this.getDBM().Bot.bot.destroy();
+	process.exit(0);
 },
 
 mod: function(DBM) {

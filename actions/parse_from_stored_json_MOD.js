@@ -11,93 +11,78 @@ module.exports = {
 	variableStorage: function(data, varType) {
 		const type = parseInt(data.storage);
 		if (type !== varType) return;
-
 		if (varType == typeof object) return [data.varName, "JSON Object"];
 		else {
 			return [data.varName, "JSON " + varType + " Value"];
 		}
 	},
 
-	fields: ["behavior", "jsonObjectVarName", "path", "storage", "varName"],
+	fields: ["storage", "json", "path", "storage2", "varName"],
 
 	html: function(isEvent, data) {
 	return `
-	<div style="margin: 0; overflow-y: none;">
-		<div>
-			<p>
-				<u>Mod Info:</u><br>
-				Authors: ${this.author}
-			</p>
+	<div>
+		<div style="padding-top: 13px; float: left; width: 35%;">
+			Source JSON Object:<br>
+			<select id="storage" class="round" onchange="glob.refreshVariableList(this)">
+				${data.variables[1]}
+			</select>
 		</div>
-		<div style="width: 80%;">
-			<div><br>
-				<label for="jsonObjectVarName">
-					<font color="white">Stored JSON Variable Name:</font>
-				</label>
-				<input id="jsonObjectVarName" class="round" type="text"><br>
-			</div>
-			<div>
-			JSON Path: (supports the usage of <a href="http://goessner.net/articles/JsonPath/index.html#e2" target="_blank">JSON Path 	(Regex)</a>)<br>
-				<input id="path" class="round" ;" type="text"><br>
-			</div>
+		<div style="padding-top: 13px; float: right; width: 60%;">
+			JSON Storage Variable Name:<br>
+			<input id="json" class="round" type="text" list="variableList">
 		</div>
-		<div style="width: 80%;">
-			<div style="float: left; width: 30%;">
-				<label for="storage">
-					<font color="white">Store In:</font>
-				</label>
-				<select id="storage" class="round" onchange="glob.variableChange(this, 'varNameContainer')">
-					${data.variables[1]}
-				</select>
-			</div>
-			<div id="varNameContainer" style="margin-left: 10px; float: left; width: 65%;">
-				<label for="varName">
-					<font color="white">Variable Name:</font>
-				</label>
-				<input id="varName" class="round" type="text">
-			</div>
+	</div>
+	<div>
+		<div style="padding-top: 13px; float: left; width: 93%;">
+			JSON Path: (Support Regex)<br>
+			<input id="path" class="round" type="text">
 		</div>
-		<div>
-			<div style="float: left;">
-				<br>
-				<label for="behavior">
-					<font color="white">End Behavior:</font>
-				</label>
-				<select id="behavior" class="round" ;>
-					<option value="0" selected>Call Next Action Automatically</option>
-					<option value="1">Do Not Call Next Action</option>
-				</select>
-			</div>
-			<div style="float: left; margin-left: 10px; width: 30%;">
-				<br>
-				<label for="debugMode">
-					<font color="white">Debug Mode:</font>
-				</label>
-				<select id="debugMode" class="round">
-					<option value="0" selected>Disabled</option>
-					<option value="1">Enabled</option>
-				</select>
-			</div>
+	</div>
+	<div>
+		<div style="padding-top: 13px; float: left; width: 35%;">
+			Store In:<br>
+			<select id="storage2" class="round">
+				${data.variables[1]}
+			</select>
+		</div>
+		<div style="padding-top: 13px; float: right; width: 60%;">
+			Variable Name:<br>
+			<input id="varName" class="round" type="text">
 		</div>
 	</div>`
 	},
 
 	init: function() {
-		const { glob, document } = this;
-		glob.variableChange(document.getElementById("storage"), "varNameContainer");
+		const {glob, document} = this;	
+		glob.refreshVariableList(document.getElementById('storage'));
 	},
 
 	action: function(cache) {
-		const WrexMODS = this.getWrexMods();
 		const data = cache.actions[cache.index];
-		const varName = this.evalMessage(data.varName, cache);
+		const {JSONPath} = require('jsonpath-plus');
+
 		const storage = parseInt(data.storage);
-		const jsonObjectVarName = this.evalMessage(data.jsonObjectVarName, cache);
+		const jsonName = this.evalMessage(data.json, cache);
+		const json = this.getVariable(storage, jsonName, cache);
 		const path = this.evalMessage(data.path, cache);
-		const jsonRaw = this.getVariable(storage, jsonObjectVarName, cache);
-		const DEBUG = parseInt(data.debugMode);
-		let jsonData;
-		if (typeof jsonRaw !== "object") {
+
+		if (path) {
+			try {
+				result = JSONPath({path:path,json});
+				if (result.length <= 1) result = result[0];
+				console.log(result)
+				const varName = this.evalMessage(data.varName, cache);
+				const storage2 = parseInt(data.storage2);
+				this.storeValue(result, storage2, varName, cache);
+				this.callNextAction(cache);
+			} catch (err) {
+				this.displayError(data, cache, err)
+			}
+		} else {
+			console.error("Path not defined.")
+		}
+		/*if (typeof jsonRaw !== "object") {
 			jsonData = JSON.parse(jsonRaw);
 		} else {
 			jsonData = jsonRaw;
@@ -156,7 +141,8 @@ module.exports = {
 
 		if (data.behavior === "0") {
 			this.callNextAction(cache);
-		}
+		}*/
+
 	},
 
 	mod: function(DBM) {

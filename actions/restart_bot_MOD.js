@@ -24,13 +24,12 @@ module.exports = {
 	},
 
 	action: function(cache) {
-		const data = cache.actions[cache.index];
 		const child = require('child_process')
 		const path = require('path');
 		const filename = path.basename(process.argv[1]);
-		this.getDBM().Bot.bot.destroy()
+		this.getDBM().Bot.bot.destroy();
 		console.log(`Restarting ${filename}...`)
-		child.execSync(`node ${filename}`,{cwd: process.cwd(),stdio:[0,1,2]}).catch(e => console.log('An error in Restart 	Bot MOD: ' + e))
+		child.execSync(`node ${filename}`,{cwd: process.cwd(),stdio:[0,1,2]}).catch(e => console.error('An error in Restart Bot MOD: ' + e))
 	},
 
 	mod: function(DBM) {}

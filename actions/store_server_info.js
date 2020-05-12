@@ -8,7 +8,7 @@ module.exports = {
 		const servers = [
 			'Current Server', 'Temp Variable', 'Server Variable', 'Global Variable'
 		];
-		const info = ['Server Object', 'Server ID', 'Server Name', 'Server Name Acronym', 'Server Region', 'Server Icon URL', 'Server Verification Level', 'Server Default Channel', 'Server AFK Channel', 'Server System Channel', 'Server Default Role', 'Server Owner Member', 'Server Bot Member Object', 'Server Channel List', 'Server Role List', 'Server Member List', 'Server Emoji List', 'Server Member Count', 'Creation Date', 'Time To AFK', 'Is Server Available?', 'More than 250 members?', 'Date Bot Joined Server', 'Channel Amount', 'Emoji Amount', 'Embed Links', 'DND Members Count', 'Online Members Count (fixed)', 'Offline Members Count', 'Idle Members Count', 'Total Bots Count In Server', 'Server Channel IDs', 'Server Role IDs', 'Server Member IDs', 'Server Bot Member Count', 'Server Human Member Count', 'Server Member Count', 'Role Count', 'Text Channel Count', 'Voice Channel Count', 'Is Server Verified?', 'Banned Users List', 'Invite List', 'Server Explicit Content Filter'];
+		const info = ['Server Object', 'Server ID', 'Server Name', 'Server Name Acronym', 'Server Region', 'Server Icon URL', 'Server Verification Level', 'Server Default Channel', 'Server AFK Channel', 'Server System Channel', 'Server Default Role', 'Server Owner Member', 'Server Bot Member Object', 'Server Channel List', 'Server Role List', 'Server Member List', 'Server Emoji List', 'Server Member Count', 'Creation Date', 'Time To AFK', 'Is Server Available?', 'More than 250 members?', 'Date Bot Joined Server', 'Channel Amount', 'Emoji Amount', 'Embed Links', 'DND Members Count', 'Online Members Count (fixed)', 'Offline Members Count', 'Idle Members Count', 'Total Bots Count In Server', 'Server Channel IDs', 'Server Role IDs', 'Server Member IDs', 'Server Bot Member Count', 'Server Human Member Count', 'Server Member Count', 'Role Count', 'Text Channel Count', 'Voice Channel Count', 'Is Server Verified?', 'Banned Users List', 'Invite List', 'Server Explicit Content Filter', 'Server Booster Count', 'Server Premium Tier'];
 		return `${servers[parseInt(data.server)]} - ${info[parseInt(data.info)]}`;
 	},
 
@@ -106,6 +106,12 @@ module.exports = {
 			case 42: {
 				dataType = 'List';
 				break; }
+			case 44: { // Server Boost Count
+				dataType = 'Number';
+				break; }
+			case 45: { // Server Premium Tier
+				dataType = 'Number';
+				break; }
 		}
 		return ([data.varName2, dataType]);
 	},
@@ -187,6 +193,8 @@ module.exports = {
 						<option value="25">Embeds links?</option>
 						<option value="37">Role Count</option>
 						<option value="42">Invite List</option>
+						<option value="44">Server Boost Count</option>
+						<option value="45">Server Boost Tier</option>
 					</optgroup>				
 					<!--<option value="21">More Than 250 Members?</option>-->				
 				</select>
@@ -384,6 +392,12 @@ module.exports = {
 				break; }
 			case 43: {
 				result = targetServer.explicitContentFilter;
+				break; }
+			case 44: {
+				result = targetServer.premiumSubscriptionCount || 0;
+				break; }
+			case 45: {
+				result = targetServer.premiumTier || 0;
 				break; }
 			default: {
 				break; }

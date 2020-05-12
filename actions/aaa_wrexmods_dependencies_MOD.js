@@ -346,11 +346,6 @@ customaction.getWrexMods = function(){
 customaction.mod = function(DBM) {
 
 	WrexMODS.DBM = DBM
-	
-	//WrexMODS.CheckAndInstallNodeModule("request");
-	//WrexMODS.CheckAndInstallNodeModule("extend");
-	//WrexMODS.CheckAndInstallNodeModule("valid-url");
-
 	DBM.Actions.getWrexMods = function(){		
 		return WrexMODS;
 	}

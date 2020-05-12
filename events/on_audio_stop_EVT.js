@@ -8,8 +8,6 @@ module.exports = {
 	
 	mod: function(DBM) {
 		DBM.LeonZ.onStop = function(id) {
-			console.log("stop")
-			console.log(DBM.Audio.queue[id])
 			const { Bot, Actions } = DBM;
 			const events = Bot.$evts["On Audio Stop MOD"];
 			if(!events) return;

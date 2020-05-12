@@ -19,8 +19,6 @@ module.exports = {
 				DBM.LeonZ.play[id] = item;
 			}
 			if (playing) {
-				console.log("play")
-				console.log(DBM.Audio.queue[id])
 				const { Bot, Actions } = DBM;
 				const events = Bot.$evts["On Audio Play MOD"];
 				if(!events) return;

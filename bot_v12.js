@@ -1,13 +1,12 @@
 /******************************************************
  * Discord Bot Maker Bot
  * Version 1.5.11
- * Discord.js 12.1.1
+ * Discord.js 12.2.0
  * Robert Borghese
  ******************************************************/
 
 const DBM = {};
-DBM.version = "12.1.1";
-DBM.modifyVersion = "1.0.0";
+DBM.version = "12.2.0";
 
 const DiscordJS = DBM.DiscordJS = require('discord.js');
 
@@ -63,7 +62,7 @@ console.error = function () {
 		today2 = new Date().toLocaleDateString().replace(/\//g,'_');
 	}
 	if (today2 != today) {
-		saveLogs('error	.log', '_error.logs')
+		saveLogs('error.log', '_error.logs')
 	}
 	today = today2;
 	process.stderr.write(util.format.apply(null, arguments) + '\n');
@@ -1194,7 +1193,7 @@ CanvasJS.toBuffer = function (path) {
 }
 
 CanvasJS.toAttachment = function (path, name) {
-	const buffer = Canvas.toBuffer(path);
+	const buffer = CanvasJS.toBuffer(path);
 	const attachment = new DiscordJS.MessageAttachment(buffer, name);
 	return attachment;
 }
@@ -1890,7 +1889,7 @@ Audio.connectToVoice = function(voiceChannel) {
 		connection.on('disconnect', function() {
 			delete this.connections[voiceChannel.guild.id];
 			delete this.loop[voiceChannel.guild.id];
-			delete this.dispatchers[guild.id];
+			delete this.dispatchers[voiceChannel.guild.id];
 		}.bind(this));
 	}.bind(this)).catch(function(err) {
 		if (err.message == 'Connection not established within 15 seconds.') {

@@ -265,7 +265,7 @@ module.exports = {
                     console.log(err);
                 })
             } catch (err) {
-                console.log(a);
+                console.log(err);
             }
         }
         this.callNextAction(cache);

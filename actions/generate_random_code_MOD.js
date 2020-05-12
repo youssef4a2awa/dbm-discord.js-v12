@@ -55,7 +55,7 @@ action: function(cache) {
 		}
 		const code = (parseInt(key,36)+1).toString(10);
 		const basenum = parseInt(Math.floor(Math.random() * code),10);
-		const result = basenum.toString(36).toUpperCase()
+		result = basenum.toString(36).toUpperCase()
 		const storage = parseInt(data.storage);
 		const varName = this.evalMessage(data.varName, cache);
 		this.storeValue(result, storage, varName, cache);

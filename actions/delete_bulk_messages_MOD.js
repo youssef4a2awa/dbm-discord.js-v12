@@ -23,79 +23,78 @@ module.exports = {
 
 	html: function(isEvent, data) {
 		return `
-	<div style="width: 550px; height: 350px; overflow-y: scroll;">
-		<div style="padding-top: 8px;">
-			<div style="float: left; width: 35%;">
-				Source Channel:<br>
-				<select id="channel" class="round" onchange="glob.channelChange(this, 'varNameContainer')">
-					${data.channels[isEvent ? 1 : 0]}
-				</select>
-			</div>
-			<div id="varNameContainer" style="display: none; float: right; width: 60%;">
-				Variable Name:<br>
-				<input id="varName" class="round" type="text" list="variableList"><br>
-			</div>
-		</div><br><br><br>
-		<div style="padding-top: 8px;">
-			<div style="float: left; width: 39%;">
-				Amount to Delete:<br>
-				<input id="count" class="round" type="text">
-			</div>
-			<div style="padding-left: 3px; float: left; width: 54%;">
-				Delete By:<br>
-				<select id="type" class="round" onchange="glob.onChange1(this)">
-					<option value="0" selected>Exactly Amount</option>
-					<option value="1">Filter</option>
-				</select><br>
-			</div>
-		</div><br><br>
-		<div style="padding-top: 8px;">
-			<div style="float: left; width: 35%;">
-				Delete Message:<br>
-				<select id="option" class="round" onchange="glob.onChange2(this)">
-					<option value="0" selected>None</option>
-					<option value="1">Before The Message ID</option>
-					<option value="2">After The Message ID</option>
-					<option value="3">Around The Message ID</option>
-				</select>
-			</div>
-			<div id="varNameContainer2" style="display: none; float: right; width: 60%;">
-				Message ID:<br>
-				<input id="msgid" class="round" type="text">
-			</div>
-		</div><br><br><br>
-		<div id="filterPlaceHolder" style="display: none;">
-			<div style="float: left; width: 90%;">
-				Filter (JavaScript Strings):<br>
-				<input id="filter" class="round" type="text" value="m => m.author.id == 'someID'"><br>
-			</div>
+	<div>
+		<div style="float: left; width: 35%; padding-top: 8px;">
+			Source Channel:<br>
+			<select id="channel" class="round" onchange="glob.channelChange(this, 'varNameContainer')">
+				${data.channels[isEvent ? 1 : 0]}
+			</select>
 		</div>
-		<div>
-			<div style="float: left; width: 35%;">
-				If Delete Bulk Messages Fails:<br>
-				<select id="iffalse" class="round" onchange="glob.onChangeFalse(this)">
-					<option value="0" selected>Continue Actions</option>
-					<option value="1">Stop Action Sequence</option>
-					<option value="2">Jump To Action</option>
-					<option value="3">Skip Next Actions</option>
-				</select>
-			</div>
-			<div id="iffalseContainer" style="padding-left: 5%; display: none; float: left; width: 63%;">
-				<span id="iffalseName">Action Number</span>:<br>
-				<input id="iffalseVal" class="round" type="text">
-			</div>
-		</div><br><br><br><br>
-		<div style="padding-top: 16px;">
-			<div style="float: left; width: 35%;">
-				Store Message List To:
-				<select id="storage" class="round" onchange="glob.variableChange(this, 'varNameContainer3')">
-					${data.variables[0]}
-				</select>
-			</div>
-			<div id="varNameContainer3" style="display: none; float: right; width: 60%;">
-				Variable Name:<br>
-				<input id="varName2" class="round" type="text">
-			</div>
+		<div id="varNameContainer" style="display: none; float: right; width: 60%; padding-top: 8px;">
+			Variable Name:<br>
+			<input id="varName" class="round" type="text" list="variableList">
+		</div>
+	</div><br><br><br>
+	<div>
+		<div style="padding-top: 8px; float: left; width: 39%;">
+			Amount to Delete:<br>
+			<input id="count" class="round" type="text">
+		</div>
+		<div style="padding-top: 8px; padding-left: 3px; float: left; width: 55%;">
+			Delete By:<br>
+			<select id="type" class="round" onchange="glob.onChange1(this)">
+				<option value="0" selected>Exactly Amount</option>
+				<option value="1">Filter</option>
+			</select>
+		</div>
+	</div><br><br><br>
+	<div>
+		<div style="float: left; width: 35%; padding-top: 8px;">
+			Delete Message:<br>
+			<select id="option" class="round" onchange="glob.onChange2(this)">
+				<option value="0" selected>None</option>
+				<option value="1">Before The Message ID</option>
+				<option value="2">After The Message ID</option>
+				<option value="3">Around The Message ID</option>
+			</select>
+		</div>
+		<div id="varNameContainer2" style="display: none; float: right; width: 60%; padding-top: 8px;">
+			Message ID:<br>
+			<input id="msgid" class="round" type="text">
+		</div>
+	</div>
+	<div id="filterPlaceHolder" style="display: none;">
+		<div style="float: left; width: 90%; padding-top: 8px;">
+			Filter (JavaScript Strings):<br>
+			<input id="filter" class="round" type="text" value="m => m.author.id == 'someID'">
+		</div>
+	</div>
+	<div>
+		<div style="float: left; width: 35%; padding-top: 8px;">
+			If Delete Bulk Messages Fails:<br>
+			<select id="iffalse" class="round" onchange="glob.onChangeFalse(this)">
+				<option value="0" selected>Continue Actions</option>
+				<option value="1">Stop Action Sequence</option>
+				<option value="2">Jump To Action</option>
+				<option value="3">Skip Next Actions</option>
+				<option value="4">Jump To Anchor</option>
+			</select>
+		</div>
+		<div id="iffalseContainer" style="padding-left: 5%; display: none; float: left; width: 65%; padding-top: 8px;">
+			<span id="iffalseName">Action Number</span>:<br>
+			<input id="iffalseVal" class="round" type="text">
+		</div>
+	</div>
+	<div>
+		<div style="float: left; width: 35%; padding-top: 8px;">
+			Store Message List To:
+			<select id="storage" class="round" onchange="glob.variableChange(this, 'varNameContainer3')">
+				${data.variables[0]}
+			</select>
+		</div>
+		<div id="varNameContainer3" style="display: none; float: right; width: 60%; padding-top: 8px;">
+			Variable Name:<br>
+			<input id="varName2" class="round" type="text">
 		</div>
 	</div>`
 	},
@@ -180,7 +179,7 @@ module.exports = {
 			let before = messages.last(1)[0].id;
 			let fetch = await msg.channel.messages.fetch({limit:100, before: before})
 			let result = fetch.filter(filter);
-			messages = messages.concat(result)
+			messages = messages.concat(result);
 		}
 		while (messages.size > limit) {
 			messages = messages.first(limit);
