@@ -26,11 +26,11 @@
 # Installation
 * Download the actions folder from above.
 * Rename actions folder to actions_old if you have discord.js v11 with original dbm mod.
-* Copy and paste the actions folder to your bot's folder (Make sure to backup previous actions folder).
+* Copy and paste all the files and foldesr to your bot's folder (Make sure to backup previous actions and events folder).
 * Copy the bot_v12.js file to your bot's folder
 
 # Running the bot
-Since dbm doesn't support Discord.js V12.1.1 you'll have to run the bot through Command prompt.
+Since dbm doesn't support Discord.js V12 you'll have to run the bot through Command prompt.
 
 # Running the bot in the Command Prompt
 This process requires [NodeJS](https://nodejs.org/dist/v12.16.1/node-v12.16.1-x64.msi) to be installed on your computer.
