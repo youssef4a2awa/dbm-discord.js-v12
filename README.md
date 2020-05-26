@@ -23,7 +23,7 @@
 ## opentype.js version: V1.3.3 (Draw text in image)
 * Install it by running `npm i opentype.js` in your console.
 ## @discordjs/opus version: V0.3.2 (For opus library)
-* Install it by running `npm i @discordjs/opus in your console.
+* Install it by running `npm i @discordjs/opus` in your console.
 ## ffmpeg-static version: 4.2.2 (For playing audio)
 * Install it by running `npm i ffmpeg-static` in your console.
 
