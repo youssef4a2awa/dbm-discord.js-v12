@@ -12,16 +12,20 @@
 * Install Node.js V12.6.1 [here](https://nodejs.org/dist/v12.16.1/node-v12.16.1-x64.msi)
 ## Discord.JS version: V12.2.0
 * Install it by running `npm i discord.js` in your console.
-## ytdl-core version: V2.0.1
+## ytdl-core version: V2.0.1 (For gethering youtube info and for play youtube video)
 * Install it by running `npm i ytdl-core` in your console.
-## ytsr version: V0.1.13
+## ytsr version: V0.1.13 (For searching youtube video)
 * Install it by running `npm i ytsr` in your console.
-## ytpl version: V0.1.21
+## ytpl version: V0.1.21 (For searching youtube playlist)
 * Install it by running `npm i ytpl` in your console.
-## canvas version: V2.6.1
+## canvas version: V2.6.1 (For image library)
 * Install it by running `npm i canvas` in your console.
-## opentype.js version: V1.3.3
+## opentype.js version: V1.3.3 (Draw text in image)
 * Install it by running `npm i opentype.js` in your console.
+## @discordjs/opus version: V0.3.2 (For opus library)
+* Install it by running `npm i @discordjs/opus in your console.
+## ffmpeg-static version: 4.2.2 (For playing audio)
+* Install it by running `npm i ffmpeg-static` in your console.
 
 # Installation
 * Download the actions folder from above.
